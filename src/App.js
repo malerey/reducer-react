@@ -1,26 +1,70 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useReducer } from 'react';
 import './App.css';
 
-function App() {
+const tareasReducer = (tareas, accion) => {
+  if (accion.type === "MARCAR_COMPLETADA") {
+    return tareas.map((tarea) => {
+      if (tarea.id === accion.payload.id) {
+        return {...tarea, completada: !tarea.completada}
+      }
+      else {
+        return tarea;
+      }
+    })
+  }
+  else return tareas
+}
+const tareas = [
+  {
+    id: 0,
+    nombre: 'Aprender Hooks',
+    completada: true,
+  },
+  {
+    id: 1,
+    nombre: 'Aprender Reducer',
+    completada: false,
+  },
+  {
+    id: 2,
+    nombre: 'Aprender Context',
+    completada: false,
+  },
+]
+
+
+const App = () => {
+  // le tenemos que pasar un reducer y un estado inicial
+  // nos devuelve info modificada y un dispatc
+
+  const [tareasModificadas, dispatch] = useReducer(tareasReducer, tareas)
+
+  const handleChange = (idParams) => {
+    const accion = {
+      type: "MARCAR_COMPLETADA",
+      payload: {
+        id: idParams
+      }
+    }
+
+    dispatch(accion)
+  };
+
+  console.log(tareasModificadas);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {tareasModificadas.map((tarea) => (
+        <div key={tarea.id}>
+          {tarea.nombre}
+          <input
+            type="checkbox"
+            onChange={() => handleChange(tarea.id)}
+            checked={tarea.completada}
+          />
+        </div>
+      ))}
     </div>
   );
-}
+};
 
 export default App;
